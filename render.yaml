@@ -1,0 +1,41 @@
+# Render Blueprint: New -> Blueprint -> pick your GitHub repo
+services:
+  # ---- Bot (webhook mode). Free plan sleeps when idle; Telegram's next update wakes it. ----
+  - type: web
+    name: tg-ai-bot
+    runtime: docker
+    plan: free            # change to starter for always-on (no wake-up delay)
+    autoDeploy: true      # every git push redeploys
+    envVars:
+      - key: BOT_TOKEN
+        sync: false       # Render asks you for the value
+      - key: ADMIN_IDS
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3.5-flash
+      - key: WEBHOOK_SECRET
+        generateValue: true
+      - key: DATA_DIR
+        value: /tmp/data   # free plan has no persistent disk
+      # optional (add in Dashboard -> Environment): WHITELIST_IDS, SYSTEM_PROMPT
+
+  # ---- Userbot (needs an always-on paid worker + TG_SESSION from make_session.py) ----
+  # - type: worker
+  #   name: tg-userbot
+  #   runtime: docker
+  #   plan: starter
+  #   dockerCommand: python userbot.py
+  #   autoDeploy: true
+  #   envVars:
+  #     - key: TG_API_ID
+  #       sync: false
+  #     - key: TG_API_HASH
+  #       sync: false
+  #     - key: TG_SESSION
+  #       sync: false
+  #     - key: GEMINI_API_KEY
+  #       sync: false
+  #     - key: DATA_DIR
+  #       value: /tmp/data

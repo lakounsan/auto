@@ -1,0 +1,30 @@
+services:
+  bot:
+    build: .
+    command: python bot_ai.py
+    env_file: .env
+    environment: { DATA_DIR: /data }
+    volumes: ["./data:/data"]
+    restart: unless-stopped
+
+  userbot:
+    build: .
+    command: python userbot.py
+    env_file: .env
+    environment: { DATA_DIR: /data }
+    volumes: ["./data:/data"]
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    profiles: ["userbot"]   # only starts with: docker compose --profile userbot up
+
+  caddy:                    # HTTPS reverse proxy for webhook mode
+    image: caddy:2
+    env_file: .env
+    ports: ["80:80", "443:443"]
+    volumes: ["./Caddyfile:/etc/caddy/Caddyfile", "caddy_data:/data"]
+    restart: unless-stopped
+    profiles: ["webhook"]
+
+volumes:
+  caddy_data:
