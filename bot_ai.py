@@ -1,4 +1,5 @@
 """Telegram BOT (BotFather) with keyword rules + Gemini AI fallback."""
+import asyncio
 import hashlib
 import logging
 import os
@@ -149,6 +150,12 @@ async def cmd_wl(u, c):
 
 
 def main():
+    try:
+        asyncio.get_running_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
     app = Application.builder().token(BOT_TOKEN).build()
     for name, fn in [("start", start), ("on", cmd_on), ("off", cmd_off), ("ai", cmd_ai),
                      ("prompt", cmd_prompt), ("reset", cmd_reset), ("list", cmd_list),
